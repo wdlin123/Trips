@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>德國童話六日遊</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Lora:ital,wght@0,400;0,600;1,400&family=Noto+Serif+TC:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* 童話風格自訂 CSS */
+        body {
+            font-family: 'Noto Serif TC', 'Lora', serif;
+            background-color: #fdf8ef; /* 羊皮紙色 */
+            color: #2c1e16; /* 深墨水色 */
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d0c4a8' fill-opacity='0.15'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        
+        .title-font {
+            font-family: 'Cinzel', 'Noto Serif TC', serif;
+        }
+
+        /* 古典邊框裝飾 */
+        .fairy-tale-border {
+            border: 2px solid #355E3B; /* 森林綠 */
+            box-shadow: 0 0 0 4px #fdf8ef, 0 0 0 5px #B89947; /* 燙金外框效果 */
+            border-radius: 8px;
+        }
+
+        .chapter-card {
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #ffffff 0%, #fcf7eb 100%);
+        }
+        
+        .chapter-card:active {
+            transform: scale(0.98);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* 頁面切換動畫 */
+        .page-transition {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 時間軸設計 */
+        .timeline-container {
+            position: relative;
+        }
+        .timeline-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 20px;
+            width: 2px;
+            background: #B89947; /* 燙金線 */
+        }
+        .timeline-item {
+            position: relative;
+            padding-left: 50px;
+            margin-bottom: 2rem;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 14px;
+            top: 6px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #fdf8ef;
+            border: 3px solid #355E3B;
+            box-shadow: 0 0 0 2px #B89947;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen">
+
+    <!-- 頂部導航列 (裝飾用) -->
+    <header class="bg-[#1a3622] text-[#fdf8ef] py-4 shadow-md sticky top-0 z-50 border-b-4 border-[#B89947]">
+        <div class="container mx-auto px-4 text-center relative">
+            <h1 class="text-2xl font-bold title-font tracking-wider">
+                <span class="text-[#B89947]">❈</span> 德國漫遊紀 <span class="text-[#B89947]">❈</span>
+            </h1>
+        </div>
+    </header>
+
+    <main id="app" class="container mx-auto px-4 py-8 max-w-lg">
+        <!-- 內容將由 JavaScript 動態渲染 -->
+    </main>
+
+    <script>
+        // 行程資料 (故事大綱)
+        const itineraryData = [
+            {
+                id: "day1",
+                day: "第一章",
+                date: "1/29 星期五",
+                title: "星夜啟航 ✈️",
+                summary: "搭乘夜間航班，準備迎接美好的德國童話之旅。",
+                coverImg: "🌲",
+                details: [
+                    {
+                        time: "23:10",
+                        title: "乘著夜風起飛",
+                        desc: "搭乘華航 CI 61 班機，從台灣桃園機場 (TPE) 第一航廈起飛。在星空下好好休息，為接下來的冒險儲備體力。"
+                    }
+                ]
+            },
+            {
+                id: "day2",
+                day: "第二章",
+                date: "1/30 星期六",
+                title: "初抵文青之城 🥨",
+                summary: "抵達柏林，探索住宿周邊的哈克市場，並進行週末超市大採購。",
+                coverImg: "🚂",
+                details: [
+                    {
+                        time: "07:30 - 12:50",
+                        title: "降落與轉機",
+                        desc: "清晨抵達法蘭克福機場 (FRA) T3。隨後搭乘國內線，於 12:50 抵達柏林布蘭登堡機場 (BER) T1。"
+                    },
+                    {
+                        time: "13:30 - 15:00",
+                        title: "安頓溫馨小屋",
+                        desc: "搭乘 S9 城鐵直達 Hackescher Markt 站。步行至位於米特區的住處 (Tucholskystraße 34) 放置行囊。"
+                    },
+                    {
+                        time: "15:30 - 17:30",
+                        title: "迷失在哈克庭院",
+                        desc: "漫步哈克市場 (Hackescher Markt) 與哈克庭院。穿梭在充滿文青氣息與街頭藝術的紅磚小巷中。"
+                    },
+                    {
+                        time: "17:30 - 19:30",
+                        title: "在地人的糧倉採集",
+                        desc: "前往 RathausPassagen 購物中心。主攻 Kaufland 採買發泡錠、Ritter Sport 巧克力，並逛逛 Netto 超市。傍晚在 Oranienburger Straße 享用抵達後的第一頓德國晚餐。"
+                    }
+                ]
+            },
+            {
+                id: "day3",
+                day: "第三章",
+                date: "1/31 星期日",
+                title: "歷史迴聲與博物館 🏰",
+                summary: "走入歷史深處，參觀集中營，午後漫步博物館島與品嚐維也納咖啡。",
+                coverImg: "📖",
+                details: [
+                    {
+                        time: "08:30 - 13:00",
+                        title: "沈默的歷史見證",
+                        desc: "從 S Oranienburger Str. 搭乘 S1 路線直達 Oranienburg 站。參觀薩克森豪森集中營 (Sachsenhausen)，反思沉重的歷史。"
+                    },
+                    {
+                        time: "14:30 - 16:30",
+                        title: "博物館島的藝術巡禮",
+                        desc: "回到市區午餐後，漫步至博物館島。參觀氣勢磅礡的柏林大教堂，或走進新博物館尋找娜芙蒂蒂的身影。"
+                    },
+                    {
+                        time: "16:45 - 17:45",
+                        title: "愛因斯坦的午後時光",
+                        desc: "順著菩提樹下大街散步，來到 Café Einstein Unter den Linden。點杯咖啡配上經典蘋果派，享受優雅的童話午後。"
+                    },
+                    {
+                        time: "18:00 - 19:30",
+                        title: "東德記憶與璀璨夜景",
+                        desc: "參觀東德博物館 (DDR Museum)。夜幕低垂後，漫步經過聖母教堂、紅色市政廳，仰望亞歷山大廣場閃耀的柏林電視塔。"
+                    }
+                ]
+            },
+            {
+                id: "day4",
+                day: "第四章",
+                date: "2/1 星期一",
+                title: "圍牆、肉排與地標 👑",
+                summary: "欣賞東邊畫廊，品嚐人氣炸肉排，並巡禮柏林經典地標。",
+                coverImg: "🍺",
+                details: [
+                    {
+                        time: "09:30 - 11:30",
+                        title: "施普雷河畔的色彩",
+                        desc: "搭乘 S-Bahn 至 Ostbahnhof，沿著河畔漫步東邊畫廊 (East Side Gallery)，尋找著名的《兄弟之吻》。"
+                    },
+                    {
+                        time: "12:00 - 13:00",
+                        title: "金黃酥脆的誘惑",
+                        desc: "午餐直奔畫廊終點旁的 Scheers Schnitzel，大口咬下在地超人氣的炸肉排。"
+                    },
+                    {
+                        time: "13:00 - 15:30",
+                        title: "冷戰記憶與猶太歷史",
+                        desc: "搭地鐵至 Hallesches Tor 參觀柏林猶太博物館。隨後前往查理檢查哨 (Checkpoint Charlie) 感受冷戰氛圍。"
+                    },
+                    {
+                        time: "15:45 - 17:30",
+                        title: "甜蜜與莊嚴的交錯",
+                        desc: "至 Rausch Schokoladenhaus 採買精美巧克力。傍晚穿梭於歐洲被害猶太人紀念碑，並在夕陽下與布蘭登堡門合影。"
+                    },
+                    {
+                        time: "17:30 之後",
+                        title: "上帝視角的晚安",
+                        desc: "步行前往德國國會大廈 (Reichstag Building)，登上玻璃圓頂俯瞰柏林夜景（需提前預約），為旅程畫下完美句點。"
+                    }
+                ]
+            },
+            {
+                id: "day5",
+                day: "第五章",
+                date: "2/2 星期二",
+                title: "南下巴伐利亞 🚄",
+                summary: "搭乘 ICE 高鐵前往慕尼黑，感受工業驕傲與大口吃肉喝酒的熱情。",
+                coverImg: "🍺",
+                details: [
+                    {
+                        time: "08:00 - 12:30",
+                        title: "穿越德國的鐵道之旅",
+                        desc: "搭乘 ICE 德國高鐵自柏林出發，約 4 小時車程直達慕尼黑中央車站 (München Hbf)。沿途欣賞地貌從平原轉為南德丘陵的變化。"
+                    },
+                    {
+                        time: "13:00 - 14:00",
+                        title: "入住西區溫馨公寓",
+                        desc: "搭乘 S-Bahn 前往 Laim 站周邊，入住位於 Landsberger Str. 291 的公寓放妥行囊，準備展開下半場旅程。"
+                    },
+                    {
+                        time: "14:30 - 17:00",
+                        title: "極致工藝 BMW 博物館",
+                        desc: "搭乘 U-Bahn 轉赴奧林匹克園區，參觀 BMW 博物館。見證百年汽車工藝的演進與充滿科技感的未來概念車。"
+                    },
+                    {
+                        time: "17:30 - 18:30",
+                        title: "舊城區的心臟",
+                        desc: "回到市中心的瑪麗恩廣場 (Marienplatz) 欣賞壯麗的哥德式新市政廳與鐘琴，並散步至旁邊的穀物市場 (Viktualienmarkt) 感受在地市集餘溫。"
+                    },
+                    {
+                        time: "18:45 之後",
+                        title: "皇家啤酒館的狂歡",
+                        desc: "晚餐直奔赫赫有名的皇家啤酒館 (Hofbräuhaus)。點一份脆皮烤豬腳 (Schweinshaxe)，舉起一公升的啤酒杯，在巴伐利亞傳統音樂中乾杯！"
+                    }
+                ]
+            },
+            {
+                id: "day6",
+                day: "第六章",
+                date: "2/3 星期三",
+                title: "王城巡禮與購物 👑",
+                summary: "探索慕尼黑的宮廷奢華，並在舊城區的購物大道享受悠閒的午後。",
+                coverImg: "🥨",
+                details: [
+                    {
+                        time: "09:30 - 12:00",
+                        title: "寧芬堡宮的晨間漫步",
+                        desc: "由於住宿地離此不遠，早上先搭乘路面電車前往巴伐利亞王室的夏宮「寧芬堡宮」(Schloss Nymphenburg)，欣賞華麗的巴洛克建築與天鵝湖畔。"
+                    },
+                    {
+                        time: "12:30 - 14:00",
+                        title: "卡爾廣場與午餐",
+                        desc: "搭車回到舊城區西側起點的卡爾廣場 (Karlsplatz/Stachus)。沿著 Neuhauser 購物大道邊走邊逛，並在附近享用午餐。"
+                    },
+                    {
+                        time: "14:30 - 16:30",
+                        title: "慕尼黑王宮的奢華",
+                        desc: "參觀位於市中心的慕尼黑王宮 (Munich Residenz)。走進金碧輝煌的古董館 (Antiquarium)，感受歐洲頂級的宮廷藝術。"
+                    },
+                    {
+                        time: "16:45 - 18:00",
+                        title: "皇家花園與冰河衝浪",
+                        desc: "穿越音樂廳廣場，漫步至英國花園 (Englischer Garten) 入口處。在這裡可以觀賞到慕尼黑超酷的城市奇觀：冰河衝浪客 (Eisbachwelle)。"
+                    }
+                ]
+            },
+            {
+                id: "day7",
+                day: "第七章",
+                date: "2/4 星期四",
+                title: "踏雪尋湖 ❄️",
+                summary: "展開自駕之旅，直奔南德絕美的阿爾卑斯山區，尋訪如夢似幻的冬季國王湖。",
+                coverImg: "🚗",
+                details: [
+                    {
+                        time: "08:30 - 09:30",
+                        title: "取車與出發",
+                        desc: "一早在慕尼黑市區的租車公司取車，正式展開南德公路旅行！我們將一路往東南開向壯麗的阿爾卑斯山區。"
+                    },
+                    {
+                        time: "09:30 - 12:00",
+                        title: "阿爾卑斯山公路漫遊與午餐",
+                        desc: "驅車直奔國王湖所在的貝希特斯加登 (Berchtesgaden) 地區，車程約 2 小時。抵達後，在湖畔小鎮享用巴伐利亞風味的溫暖午餐，不用趕路，心情更放鬆。"
+                    },
+                    {
+                        time: "12:30 - 15:30",
+                        title: "冬日童話：國王湖遊船",
+                        desc: "搭乘寧靜的電動船遊覽國王湖 (Königssee)。冬季船隻會行駛至標誌性的聖巴多羅買教堂 (St. Bartholomä，即紅頂教堂) 便折返。好好享受冰雪覆蓋的群山與清澈湖水交織的絕美景致。"
+                    },
+                    {
+                        time: "16:00 - 18:30",
+                        title: "滿載回憶的歸途",
+                        desc: "結束湖畔漫步後，趁著天黑前驅車返回慕尼黑市區的住宿地。因為今天不趕行程，晚上有充裕的時間在慕尼黑市區悠閒享用晚餐。"
+                    }
+                ]
+            },
+            {
+                id: "day8",
+                day: "第八章",
+                date: "2/5 星期五",
+                title: "從童話城堡到購物天堂 🛍️",
+                summary: "拜訪浪漫的新天鵝堡，隨後跨越邦界，前往德國最大的 Outlet 血拚，最終落腳斯圖加特。",
+                coverImg: "🏰",
+                details: [
+                    {
+                        time: "07:00 - 09:00",
+                        title: "向童話城堡前進",
+                        desc: "今天行程緊湊，建議提早出發！從慕尼黑駕車約 2 小時，前往位於施萬高 (Schwangau) 的夢幻地標。"
+                    },
+                    {
+                        time: "09:00 - 12:30",
+                        title: "路德維希的浪漫：新天鵝堡",
+                        desc: "抵達新天鵝堡 (Neuschwanstein Castle)。建議搭乘接駁巴士或馬車上山，參觀這座啟發迪士尼城堡靈感的宏偉建築（務必提前上網預約門票！）。"
+                    },
+                    {
+                        time: "13:00 - 15:30",
+                        title: "跨越邦界的長征",
+                        desc: "在山腳下簡單午餐後，驅車前往位於巴登-符騰堡邦的麥琴根 (Metzingen)。這段車程較長，約需 2.5 小時，請準備好歌單並輪流駕駛。"
+                    },
+                    {
+                        time: "15:30 - 19:00",
+                        title: "麥琴根名品村血拚時光",
+                        desc: "抵達 Outletcity Metzingen！這裡是 Hugo Boss 的發源地，也是德國規模最大的 Outlet。盡情在各大國際精品與服飾品牌間尋寶購物。"
+                    },
+                    {
+                        time: "19:30 - 20:30",
+                        title: "前往斯圖加特新家",
+                        desc: "結束購物後，驅車前往斯圖加特 Weilimdorf 區的住宿地點 (Pforzheimer Str. 383/2)。辦理入住並在附近尋找美味的晚餐，為這充實的一天畫下句點。"
+                    }
+                ]
+            },
+            {
+                id: "day9",
+                day: "第九章",
+                date: "2/6 星期六",
+                title: "法式童話：阿爾薩斯雙城記 🇫🇷",
+                summary: "跨越國界前往法國，穿梭在科爾馬的小威尼斯與史特拉斯堡的木桁架建築中，體驗截然不同的法式浪漫。",
+                coverImg: "🥐",
+                details: [
+                    {
+                        time: "06:52 - 09:25",
+                        title: "跨越國境的晨車",
+                        desc: "清晨從斯圖加特搭乘 ICE 9578 班次出發，中轉後前往法國童話小鎮科爾馬 (Colmar)。"
+                    },
+                    {
+                        time: "09:30 - 14:30",
+                        title: "漫步霍爾的移動城堡",
+                        desc: "穿梭在科爾馬舊城區，參觀聖瑪爾定教堂、巴托迪博物館、Maison Pfister。逛逛有頂市場 (Marché Couvert)，並在如夢似幻的小威尼斯 (Little Venice) 留下美麗合影。"
+                    },
+                    {
+                        time: "15:06 - 15:40",
+                        title: "前往歐洲首都",
+                        desc: "搭乘火車前往史特拉斯堡 (Strasbourg)。(註：原訂 14:39 為筆誤，車程約需半小時)。"
+                    },
+                    {
+                        time: "15:45 - 19:00",
+                        title: "史特拉斯堡舊城巡禮",
+                        desc: "走過沃邦攔河壩，漫步於迷人的小法蘭西 (Petite France)。沿途行經谷登堡廣場、克勒貝爾廣場，朝聖壯麗的史特拉斯堡主教座堂，順道逛逛 LV 精品店。"
+                    },
+                    {
+                        time: "19:44 - 21:04",
+                        title: "夜歸斯圖加特",
+                        desc: "搭乘 ICE 9589 班次返回斯圖加特中央車站，回到熟悉的住處好好休息。"
+                    }
+                ]
+            },
+            {
+                id: "day10",
+                day: "第十章",
+                date: "2/7 星期日",
+                title: "斯圖加特雙B巡禮 🏎️",
+                summary: "深度見證斯圖加特的百年汽車工業，下午驅車直奔法蘭克福，享受悠閒的美茵河畔傍晚。",
+                coverImg: "🏎️",
+                details: [
+                    {
+                        time: "09:30 - 14:30",
+                        title: "汽車名城雙星",
+                        desc: "早上連續朝聖斯圖加特兩大汽車聖殿：賓士博物館與保時捷博物館。今天不用趕路，可以放慢腳步，好好欣賞這兩座極具科技感與歷史底蘊的博物館。"
+                    },
+                    {
+                        time: "15:00 - 17:30",
+                        title: "一路向北駛往法蘭克福",
+                        desc: "結束博物館行程後，驅車北上，約 2.5 小時車程即可直達法蘭克福市區。"
+                    },
+                    {
+                        time: "17:30 - 18:30",
+                        title: "入住市中心公寓",
+                        desc: "抵達法蘭克福，入住位於市中心的 Citadines City Centre Frankfurt，放下行囊，準備迎接旅程的尾聲。"
+                    },
+                    {
+                        time: "18:30 之後",
+                        title: "道地黑森邦風味",
+                        desc: "晚餐品嚐法蘭克福特色美食：來杯清爽的蘋果酒 (Apfelwein) 搭配淋上青醬的炸豬排 (Grüne Soße Schnitzel)，體驗當地人的日常。"
+                    }
+                ]
+            },
+            {
+                id: "day11",
+                day: "第十一章",
+                date: "2/8 星期一",
+                title: "美茵河畔的金融與古典 💼",
+                summary: "穿梭在法蘭克福的現代高樓與古典廣場間，享受甜蜜下午茶與最後的瘋狂購物。",
+                coverImg: "🛍️",
+                details: [
+                    {
+                        time: "09:00 - 12:30",
+                        title: "歐元的心臟與老城區",
+                        desc: "與歐元塔 (Eurotower) 合影，隨後參觀大文豪的歌德故居。漫步至美美的羅馬人廣場 (Römerberg) 與法蘭克福鐵橋 (Eiserner Steg)，並朝聖法蘭克福皇帝大教堂。"
+                    },
+                    {
+                        time: "12:30 - 14:30",
+                        title: "室內小市場與甜蜜時光",
+                        desc: "在法蘭克福室內小市場 (Kleinmarkthalle) 尋覓在地小吃。隨後前往 IIMORI Patisserie 享用復古法式蛋糕，或到 Bitter & Zart Chocolaterie 品嚐精緻巧克力。"
+                    },
+                    {
+                        time: "15:00 - 18:00",
+                        title: "黃金購物軸線",
+                        desc: "沿著采爾大道 (Zeil) 展開最後採買，逛逛造型前衛的 MyZeil 購物中心。一路從 Konstablerwache 走到 Hauptwache。若想尋找頂級精品，就轉往歌德大道 (Goethestraße)。"
+                    },
+                    {
+                        time: "19:00 之後",
+                        title: "Skyline Plaza 最終補給",
+                        desc: "晚餐後前往 Skyline Plaza 購物中心，這裡有大型藥妝店與超市，可以把要帶回台灣的發泡錠、小熊軟糖等伴手禮一次補齊！"
+                    }
+                ]
+            },
+            {
+                id: "day12",
+                day: "第十二章",
+                date: "2/9 星期二",
+                title: "滿載回憶的歸途 🛫",
+                summary: "前往法蘭克福機場辦理退稅手續，搭機返回溫暖的家。",
+                coverImg: "✈️",
+                details: [
+                    {
+                        time: "08:00 - 10:30",
+                        title: "前往機場與退稅",
+                        desc: "享用早餐後，從飯店出發前往法蘭克福機場 (FRA)。記得預留充足的時間辦理退稅手續與託運行李。"
+                    },
+                    {
+                        time: "11:00",
+                        title: "起飛與告別",
+                        desc: "搭乘華航 CI62 班機從第三航廈 (T3) 起飛。在雲端回味這趟十三天的美好德國童話旅程。"
+                    }
+                ]
+            },
+            {
+                id: "day13",
+                day: "最終章",
+                date: "2/10 星期三",
+                title: "抵達家鄉 🇹🇼",
+                summary: "平安降落台灣，為這趟旅程畫下完美的句點。",
+                coverImg: "🏠",
+                details: [
+                    {
+                        time: "06:15",
+                        title: "晨光中降落",
+                        desc: "清晨抵達臺灣桃園機場 (TPE) 第一航廈。帶著滿滿的回憶與戰利品，平安返家，期待下次再見！"
+                    }
+                ]
+            }
+        ];
+
+        const app = document.getElementById('app');
+
+        // 渲染目錄頁 (Home)
+        function renderHome() {
+            window.scrollTo(0, 0);
+            let html = `
+                <div class="page-transition">
+                    <div class="text-center mb-10 mt-4">
+                        <p class="text-[#8B0000] font-semibold tracking-widest text-sm mb-2">GERMANY TRIP</p>
+                        <h2 class="text-3xl font-bold title-font text-[#1a3622]">故事目錄</h2>
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 20' width='100' height='20'%3E%3Cpath d='M0 10 Q 25 20 50 10 T 100 10' fill='none' stroke='%23B89947' stroke-width='2'/%3E%3C/svg%3E" class="mx-auto mt-3" alt="separator">
+                    </div>
+                    <div class="space-y-6">
+            `;
+
+            itineraryData.forEach((day, index) => {
+                html += `
+                    <div onclick="renderDay(${index})" class="chapter-card fairy-tale-border p-5 relative overflow-hidden group">
+                        <div class="flex items-center">
+                            <div class="text-4xl mr-4 bg-[#fdf8ef] rounded-full h-14 w-14 flex items-center justify-center border border-[#355E3B]">
+                                ${day.coverImg}
+                            </div>
+                            <div class="flex-1">
+                                <div class="text-xs text-[#8B0000] font-bold tracking-wider mb-1">${day.day} • ${day.date}</div>
+                                <h3 class="text-xl font-bold text-[#1a3622] mb-1">${day.title}</h3>
+                                <p class="text-sm text-gray-700 leading-relaxed">${day.summary}</p>
+                            </div>
+                            <div class="text-[#B89947] ml-2 transform group-hover:translate-x-1 transition-transform">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `
+                    </div>
+                    <div class="text-center mt-12 text-sm text-gray-500 italic">
+                        ~ 點擊篇章，翻開您的專屬童話 ~
+                    </div>
+                </div>
+            `;
+            app.innerHTML = html;
+        }
+
+        // 渲染單日詳情頁 (Day Details)
+        function renderDay(index) {
+            window.scrollTo(0, 0);
+            const data = itineraryData[index];
+            
+            let html = `
+                <div class="page-transition">
+                    <!-- 返回按鈕 -->
+                    <button onclick="renderHome()" class="mb-6 flex items-center text-[#355E3B] font-bold hover:text-[#8B0000] transition active:scale-95 px-4 py-2 bg-white rounded-full shadow border border-[#355E3B]">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                        </svg>
+                        闔上本章 (返回目錄)
+                    </button>
+
+                    <!-- 章節標題 -->
+                    <div class="text-center mb-10 fairy-tale-border bg-white p-6 relative">
+                        <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-[#fdf8ef] px-4 text-[#8B0000] font-bold text-sm tracking-widest border-x-2 border-[#B89947]">
+                            ${data.day}
+                        </div>
+                        <div class="text-gray-500 text-sm mb-2 mt-2">${data.date}</div>
+                        <h2 class="text-2xl font-bold title-font text-[#1a3622] mb-3">${data.title}</h2>
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 10' width='60' height='10'%3E%3Cpath d='M0 5 L100 5' stroke='%23B89947' stroke-width='2' stroke-dasharray='5,5'/%3E%3C/svg%3E" class="mx-auto" alt="separator">
+                    </div>
+
+                    <!-- 時間軸 -->
+                    <div class="timeline-container mt-8 pl-2 pr-2">
+            `;
+
+            data.details.forEach(item => {
+                html += `
+                    <div class="timeline-item">
+                        <div class="bg-white fairy-tale-border p-4 shadow-sm">
+                            <div class="inline-block bg-[#1a3622] text-[#fdf8ef] text-xs font-bold px-2 py-1 rounded mb-2 font-sans tracking-wide">
+                                🕰️ ${item.time}
+                            </div>
+                            <h3 class="text-lg font-bold text-[#8B0000] mb-2 title-font">${item.title}</h3>
+                            <p class="text-gray-800 text-sm leading-relaxed">${item.desc}</p>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `
+                    </div>
+                    
+                    <div class="mt-8 text-center">
+                        <button onclick="renderHome()" class="text-[#B89947] underline italic hover:text-[#8B0000]">返回故事目錄</button>
+                    </div>
+                </div>
+            `;
+            app.innerHTML = html;
+        }
+
+        // 初始化：渲染首頁
+        renderHome();
+    </script>
+</body>
+</html>
